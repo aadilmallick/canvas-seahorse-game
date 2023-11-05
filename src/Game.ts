@@ -1,14 +1,15 @@
 import { Angler1, Enemy } from "./Enemy";
 import InputHandler from "./InputHandler";
+import { Background, Foregound } from "./Layer";
 import Player from "./Player";
 import Projectile from "./Projectile";
-import Renderable from "./Renderable";
+
 import UI from "./UI";
-import { KEYS } from "./types";
+
 import Updater from "./utils/Updater";
 
 interface GameData {
-  keys: Set<KEYS>;
+  keys: Set<KEYSENUM>;
   width: number;
   height: number;
   projectiles: Projectile[];
@@ -24,14 +25,18 @@ interface GameData {
   gameOver: boolean;
   gameTimer: number;
   gameTimeLimit: number;
+  gameSpeed: number;
+  debugModeOn: boolean;
 }
 
 export default class Game {
   // other classes
-  private player: Player;
-  private inputHandler: InputHandler;
-  private ui: UI;
+  private player = new Player(this);
+  private inputHandler = new InputHandler(this);
+  private ui = new UI(this);
   private updater = new Updater(this);
+  private background = new Background(this);
+  private foreground = new Foregound(this);
 
   // game data
   public gameData: GameData;
@@ -42,11 +47,6 @@ export default class Game {
     private height: number,
     private ctx: CanvasRenderingContext2D
   ) {
-    // instantiate other classes that need game data
-    this.player = new Player(this);
-    this.inputHandler = new InputHandler(this);
-    this.ui = new UI(this);
-
     // instantiate gameData
     this.gameData = {
       keys: new Set(),
@@ -64,7 +64,9 @@ export default class Game {
       score: 0,
       gameOver: false,
       gameTimer: 0,
-      gameTimeLimit: 10000,
+      gameTimeLimit: 30000,
+      gameSpeed: 1,
+      debugModeOn: false,
     };
   }
 
@@ -72,8 +74,14 @@ export default class Game {
     return this.player;
   }
 
+  public toggleDebugMode() {
+    this.gameData.debugModeOn = !this.gameData.debugModeOn;
+  }
+
   // run all the methods here that should be run on each frame
   private update(deltaTime: number) {
+    this.background.update();
+    this.foreground.update();
     this.player.update();
     // handle projectiles, check for collisions with enemies, delete projectiles
     this.updater.updateProjectiles();
@@ -114,16 +122,27 @@ export default class Game {
 
   // all context drawing methods go in here
   private draw() {
+    // 1. clear frame
     this.ctx.clearRect(0, 0, this.width, this.height);
     this.ctx.fillStyle = "blue";
     this.ctx.fillRect(0, 0, this.width, this.height);
+
+    // 2. draw background
+    this.background.draw(this.ctx);
+
+    // 3. draw player
     this.player.draw(this.ctx);
+
+    // 4. draw projectiles and foreground
+    this.foreground.draw(this.ctx);
     this.gameData.projectiles.forEach((projectile) =>
       projectile.draw(this.ctx)
     );
 
+    // 5. draw enemies
     this.gameData.enemies.forEach((enemy) => enemy.draw(this.ctx));
 
+    // 6. draw UI settings
     this.ui.draw(this.ctx);
   }
 
@@ -133,6 +152,7 @@ export default class Game {
     this.update(deltaTime);
     this.draw();
 
+    // stop loop if game is over
     if (this.gameData.gameOver) return;
     requestAnimationFrame((timestamp) => this.loop(timestamp));
   }

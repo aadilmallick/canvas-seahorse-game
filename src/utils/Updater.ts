@@ -9,8 +9,8 @@ export default class Updater {
       projectile.update();
       // check if projectiles hit any enemy.
       // Three projectiles have to collide with enemy before enemy gets deleted
-      // Delete projectile as soon as it collides with enemy
       this.game.gameData.enemies.forEach((enemy) => {
+        // Delete projectile as soon as it collides with enemy
         if (Game.checkCollision(projectile, enemy)) {
           projectile.delete();
           enemy.decreaseLives();

@@ -224,3 +224,96 @@ export default class InputHandler {
   }
 }
 ```
+
+## Projectiles
+
+## Checking for collision
+
+## Parallax background
+
+## Player sprite animation
+
+## Debug mode
+
+## Type Declaration Files
+
+Type declaration files allow you to have essentially global custom typings for your project without having to constantly import interfaces and other custom things.
+
+Type declarations files, also known as `.d.ts` files, are **ambient typing** files, meaning that those types have to be purely explanatory and not actually executable code or values like enums are, but more on that later.
+
+Here are the basic steps:
+
+1. Create a `typings` folder in your project root
+2. Create a `typings/types.d.ts` file. This will all your ambient typings will live.
+3. Add the `typings` folder as the source for your project's ambient type declarations using the `compilerOptions.typeRoots` property in your `tsconfig.json` file.
+
+```json
+{
+  "compilerOptions": {
+    "typeRoots": ["./typings"]
+  }
+}
+```
+
+### Allowing image imports
+
+All you have to do to let typescript know how to handle importing images and the like is by declaring them as a module inside the type declaration file:
+
+```ts
+declare module "*.png";
+```
+
+### Extending window object
+
+You can add properties to the global window or global object, making them globally available. You can do this if you want to add custom methods and types to the global namespace:
+
+```ts
+declare interface Window {
+  // gets the ElectronAPI interface object from another file, and uses the typing here
+  electronAPI: import("./preload").ElectronAPI;
+}
+```
+
+By declaring the `Window` interface, you can add properties onto the existing window global object, which can be useful.
+
+### Ambient enums
+
+Enums by default cannot be used in type declaration files because they are **non-ambient**. During the javascript runtime, they compile to actual objects. They are not just types.
+
+To fix this, we can do a bit of hacking to get a nonambient and a ambient version of the same enum by attaching it to the global window namespace:
+
+These are the steps we follow in the `types.d.ts` file:
+
+1. Declare the enum using the `declare enum` keyword. This creates a non-ambient enum, but we also need an enum that resolves to a value.
+2. Attach the enum to global window object, which makes the enum an actual value
+
+```javascript
+// 1. declare the enum
+declare enum KEYSENUM {
+  ArrowUp = "ArrowUp",
+  ArrowDown = "ArrowDown",
+  Space = " ",
+}
+
+// 2. attach it to the global window object
+declare var KEYS: typeof KEYSENUM;
+window.KEYS = KEYSENUM;
+```
+
+Then in our entry point, we have to follow these steps to add the enum to the window object during the javascript runtime:
+
+```typescript
+// index.ts
+
+// 1. redefine the enum
+enum KEYSENUM {
+  ArrowUp = "ArrowUp",
+  ArrowDown = "ArrowDown",
+  Space = " ",
+}
+
+// 2. attach it to the global window object
+window.KEYS = KEYSENUM;
+```
+
+We now have two different versions of the enum: an ambient and non-ambient one. `KEYSENUM` is the one we can use as a type while `KEYS` is the one we can use as an object.

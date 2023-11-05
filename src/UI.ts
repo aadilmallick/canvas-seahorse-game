@@ -1,5 +1,4 @@
 import Game from "./Game";
-import Renderable from "./Renderable";
 
 export default class UI {
   constructor(private game: Game) {}
@@ -50,7 +49,7 @@ export default class UI {
     ctx.font = "20px Arial";
     ctx.fillText(
       `time: ${(this.game.gameData.gameTimer / 1000).toFixed(1)}`,
-      150,
+      160,
       25
     );
   }

@@ -1,5 +1,4 @@
 import Game from "./Game";
-import Renderable from "./Renderable";
 import { drawPolygon } from "./utils/utils";
 
 export abstract class Enemy implements Renderable {

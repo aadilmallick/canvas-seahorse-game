@@ -1,7 +1,7 @@
 import Game from "./Game";
 import Projectile from "./Projectile";
-import Renderable from "./Renderable";
-import { KEYS } from "./types";
+import player from "./assets/characters/player.png";
+import SpriteAnimation from "./utils/SpriteAnimator";
 
 export default class Player implements Renderable {
   public x = 20;
@@ -10,6 +10,9 @@ export default class Player implements Renderable {
   public width = 120;
   public height = 190;
   private maxSpeed = 10;
+  private image = new Image();
+  private spriteAnimator!: SpriteAnimation;
+  private imageIsLoaded = false;
 
   public update() {
     if (this.game.gameData.keys.has(KEYS.ArrowUp)) {
@@ -20,11 +23,15 @@ export default class Player implements Renderable {
       this.speedY = 0;
     }
     this.y += this.speedY;
+    this.spriteAnimator.updatePosition(this.x, this.y);
   }
 
   public draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = "red";
     ctx.fillRect(this.x, this.y, this.width, this.height);
+    if (this.imageIsLoaded) {
+      this.spriteAnimator.drawAnimation(ctx);
+    }
   }
 
   public shootTop() {
@@ -36,5 +43,19 @@ export default class Player implements Renderable {
     this.game.gameData.ammo--;
   }
 
-  constructor(private game: Game) {}
+  constructor(private game: Game) {
+    this.image.src = player;
+    this.spriteAnimator = new SpriteAnimation({
+      spriteHeight: this.height,
+      spriteWidth: this.width,
+      spriteSrc: this.image,
+      x: this.x,
+      y: this.y,
+    });
+    this.image.onload = () => {
+      this.spriteAnimator.setAnimation(0, 37);
+      this.imageIsLoaded = true;
+      console.log(this.spriteAnimator);
+    };
+  }
 }

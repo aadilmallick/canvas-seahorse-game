@@ -1,5 +1,4 @@
 import Game from "./Game";
-import Renderable from "./Renderable";
 
 // 1. create a shootTop() method in the Player class that is activated when hit space bar
 // 2. shootTop() method adds projectile instance to gamedata projectile array

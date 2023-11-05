@@ -9,7 +9,6 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build": "bun build --minify --outdir dist src/index.ts --watch"
-  },
-  "types": "types.ts"
+    "build": "bun build --outdir dist src/index.ts --watch"
+  }
 }
