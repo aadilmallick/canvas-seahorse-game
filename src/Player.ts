@@ -14,6 +14,15 @@ export default class Player implements Renderable {
   private spriteAnimator!: SpriteAnimation;
   private imageIsLoaded = false;
 
+  private boundaryDetection() {
+    if (this.y > this.game.gameData.height - this.height) {
+      this.y = this.game.gameData.height - this.height;
+    }
+    if (this.y < 0) {
+      this.y = 0;
+    }
+  }
+
   public update() {
     if (this.game.gameData.keys.has(KEYS.ArrowUp)) {
       this.speedY -= 1;
@@ -23,12 +32,14 @@ export default class Player implements Renderable {
       this.speedY = 0;
     }
     this.y += this.speedY;
-    this.spriteAnimator.updatePosition(this.x, this.y);
+    this.boundaryDetection();
   }
 
   public draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    if (this.game.gameData.debugModeOn) {
+      ctx.strokeStyle = "red";
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
+    }
     if (this.imageIsLoaded) {
       this.spriteAnimator.drawAnimation(ctx);
     }
@@ -45,12 +56,10 @@ export default class Player implements Renderable {
 
   constructor(private game: Game) {
     this.image.src = player;
-    this.spriteAnimator = new SpriteAnimation({
-      spriteHeight: this.height,
-      spriteWidth: this.width,
-      spriteSrc: this.image,
-      x: this.x,
-      y: this.y,
+    this.spriteAnimator = new SpriteAnimation(this, {
+      image: this.image,
+      numRows: 2,
+      staggerFrames: 1,
     });
     this.image.onload = () => {
       this.spriteAnimator.setAnimation(0, 37);

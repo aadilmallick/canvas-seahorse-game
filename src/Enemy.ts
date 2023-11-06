@@ -52,9 +52,11 @@ export class Angler1 extends Enemy {
   public height = 169;
   protected lives = 3;
   protected score = this.lives;
+  private image;
   constructor(game: Game) {
     super(game);
     this.y = Math.random() * (this.game.gameData.height * 0.9 - this.height);
+    this.image = document.getElementById("angler1") as HTMLImageElement;
   }
 
   draw(ctx: CanvasRenderingContext2D): void {

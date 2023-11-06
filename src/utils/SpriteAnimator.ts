@@ -1,10 +1,7 @@
 interface SpriteData {
-  spriteWidth: number;
-  spriteHeight: number;
-  spriteSrc: CanvasImageSource;
-  x: number;
-  y: number;
+  image: CanvasImageSource;
   staggerFrames?: number;
+  numRows: number;
 }
 
 export default class SpriteAnimation {
@@ -12,7 +9,7 @@ export default class SpriteAnimation {
   private animationRow: number = -1;
   private gameLoopCounter: number = 0;
   private staggerFrames: number;
-  constructor(private spriteData: SpriteData) {
+  constructor(private character: Renderable, private spriteData: SpriteData) {
     this.staggerFrames =
       spriteData.staggerFrames && spriteData.staggerFrames > 0
         ? spriteData.staggerFrames
@@ -22,16 +19,16 @@ export default class SpriteAnimation {
   // return coordinates of the specific sprite frame in the sprite sheet
   private getAnimationFrame(rowIndex: number, columnIndex: number) {
     return [
-      columnIndex * this.spriteData.spriteWidth,
-      rowIndex * this.spriteData.spriteHeight,
-      this.spriteData.spriteWidth,
-      this.spriteData.spriteHeight,
+      columnIndex * this.character.width,
+      rowIndex * this.character.height,
+      this.character.width,
+      this.character.height,
     ] as [number, number, number, number];
   }
 
   updatePosition(x: number, y: number) {
-    this.spriteData.x = x;
-    this.spriteData.y = y;
+    this.character.x = x;
+    this.character.y = y;
   }
 
   drawFrame(
@@ -40,16 +37,19 @@ export default class SpriteAnimation {
     columnIndex: number
   ) {
     ctx.drawImage(
-      this.spriteData.spriteSrc,
+      this.spriteData.image,
       ...this.getAnimationFrame(rowIndex, columnIndex),
-      this.spriteData.x,
-      this.spriteData.y,
-      this.spriteData.spriteWidth,
-      this.spriteData.spriteHeight
+      this.character.x,
+      this.character.y,
+      this.character.width,
+      this.character.height
     );
   }
 
   setAnimation(rowIndex: number, numFrames: number) {
+    if (rowIndex < 0 || rowIndex >= this.spriteData.numRows) {
+      throw new Error("Invalid row index");
+    }
     this.numFrames = numFrames;
     this.animationRow = rowIndex;
   }

@@ -201,29 +201,31 @@ var player_default = "./player-60530f842f44e2ac.png";
 
 // src/utils/SpriteAnimator.ts
 class SpriteAnimation {
-  spriteData;
+  character;
+  image;
   numFrames = -1;
   animationRow = -1;
   gameLoopCounter = 0;
   staggerFrames;
-  constructor(spriteData) {
-    this.spriteData = spriteData;
-    this.staggerFrames = spriteData.staggerFrames && spriteData.staggerFrames > 0 ? spriteData.staggerFrames : 5;
+  constructor(character, image, staggerFrames) {
+    this.character = character;
+    this.image = image;
+    this.staggerFrames = staggerFrames && staggerFrames > 0 ? staggerFrames : 5;
   }
   getAnimationFrame(rowIndex, columnIndex) {
     return [
-      columnIndex * this.spriteData.spriteWidth,
-      rowIndex * this.spriteData.spriteHeight,
-      this.spriteData.spriteWidth,
-      this.spriteData.spriteHeight
+      columnIndex * this.character.width,
+      rowIndex * this.character.height,
+      this.character.width,
+      this.character.height
     ];
   }
   updatePosition(x, y) {
-    this.spriteData.x = x;
-    this.spriteData.y = y;
+    this.character.x = x;
+    this.character.y = y;
   }
   drawFrame(ctx, rowIndex, columnIndex) {
-    ctx.drawImage(this.spriteData.spriteSrc, ...this.getAnimationFrame(rowIndex, columnIndex), this.spriteData.x, this.spriteData.y, this.spriteData.spriteWidth, this.spriteData.spriteHeight);
+    ctx.drawImage(this.image, ...this.getAnimationFrame(rowIndex, columnIndex), this.character.x, this.character.y, this.character.width, this.character.height);
   }
   setAnimation(rowIndex, numFrames) {
     this.numFrames = numFrames;
@@ -260,11 +262,12 @@ class Player {
       this.speedY = 0;
     }
     this.y += this.speedY;
-    this.spriteAnimator.updatePosition(this.x, this.y);
   }
   draw(ctx) {
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    if (this.game.gameData.debugModeOn) {
+      ctx.strokeStyle = "red";
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
+    }
     if (this.imageIsLoaded) {
       this.spriteAnimator.drawAnimation(ctx);
     }
@@ -278,13 +281,7 @@ class Player {
   constructor(game) {
     this.game = game;
     this.image.src = player_default;
-    this.spriteAnimator = new SpriteAnimation({
-      spriteHeight: this.height,
-      spriteWidth: this.width,
-      spriteSrc: this.image,
-      x: this.x,
-      y: this.y
-    });
+    this.spriteAnimator = new SpriteAnimation(this, this.image);
     this.image.onload = () => {
       this.spriteAnimator.setAnimation(0, 37);
       this.imageIsLoaded = true;
