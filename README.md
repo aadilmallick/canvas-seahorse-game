@@ -231,9 +231,21 @@ export default class InputHandler {
 
 ## Parallax background
 
-## Player sprite animation
+## sprite animation
+
+### Standard sprite animation
+
+### Delta time animation
 
 ## Debug mode
+
+## Adding fonts
+
+## Particles
+
+### Particle rotation
+
+## Explosions
 
 ## Type Declaration Files
 

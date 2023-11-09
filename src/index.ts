@@ -14,6 +14,11 @@ canvas.width = 1000;
 canvas.height = 500;
 const ctx = canvas.getContext("2d")!;
 
+window.addEventListener("resize", (e) => {
+  canvas.width = window.innerWidth;
+  game.resize(window.innerWidth);
+});
+
 console.log(canvas.width, canvas.height);
 const game = new Game(canvas.width, canvas.height, ctx);
 game.gameLoop();

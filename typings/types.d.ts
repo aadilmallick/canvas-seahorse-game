@@ -14,10 +14,11 @@ declare enum KEYSENUM {
 declare var KEYS: typeof KEYSENUM;
 window.KEYS = KEYSENUM;
 declare module "*.png";
+declare module "*.wav";
 
 interface Renderable {
-  update(): void;
-  draw(ctx: CanvasRenderingContext2D): void;
+  update(deltaTime?: number): void;
+  draw(ctx: CanvasRenderingContext2D, deltaTime?: number): void;
   x: number;
   y: number;
   width: number;
@@ -26,5 +27,5 @@ interface Renderable {
 
 interface DrawManager {
   update(): void;
-  draw(ctx: CanvasRenderingContext2D): void;
+  draw(ctx: CanvasRenderingContext2D, deltaTime?: number): void;
 }

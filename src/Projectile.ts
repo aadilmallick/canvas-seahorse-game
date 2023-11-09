@@ -1,4 +1,5 @@
 import Game from "./Game";
+import SpriteAnimation from "./utils/SpriteAnimator";
 
 // 1. create a shootTop() method in the Player class that is activated when hit space bar
 // 2. shootTop() method adds projectile instance to gamedata projectile array
@@ -9,11 +10,20 @@ import Game from "./Game";
 //    that are marked for deletion
 
 export default class Projectile implements Renderable {
-  public width = 10;
-  public height = 3;
+  public width = 36.25;
+  public height = 20;
   private speedX = 3;
   private markedForDeletion = false;
-  constructor(private game: Game, public x: number, public y: number) {}
+  private image: HTMLImageElement;
+  private spriteAnimator!: SpriteAnimation;
+  constructor(private game: Game, public x: number, public y: number) {
+    this.image = SpriteAnimation.loadImage("#fireball");
+    this.spriteAnimator = new SpriteAnimation(this, {
+      image: this.image,
+      numRows: 1,
+      numFrames: 4,
+    });
+  }
 
   update(): void {
     this.x += this.speedX;
@@ -23,8 +33,7 @@ export default class Projectile implements Renderable {
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = "yellow";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    this.spriteAnimator.drawAnimation(ctx, 0);
   }
 
   public isMarkedForDeletion() {
